@@ -260,7 +260,7 @@ static ssize_t socks5_recv_connect_reply_ipv4_addr_not_supported_stub(int fd,
 	return 1;
 }
 
-static ssize_t socks5_recv_connect_reply_ipv4_unkown_stub(int fd, void *buf,
+static ssize_t socks5_recv_connect_reply_ipv4_unknown_stub(int fd, void *buf,
 		size_t len)
 {
 	((struct socks5_reply *)buf)->ver = SOCKS5_VERSION;
@@ -622,7 +622,7 @@ static void test_socks5_send_connect_request(void)
 		req_name.port == htons(9050),
 		"socks5 send connect request domain name");
 
-	/* Unkown connection domain */
+	/* Unknown connection domain */
 
 	conn_stub = get_connection_stub();
 	conn_stub->dest_addr.domain = 0;
@@ -631,7 +631,7 @@ static void test_socks5_send_connect_request(void)
 	ret = socks5_send_connect_request(conn_stub);
 
 	ok(ret == -EINVAL, "socks5 send connect request returns error for "
-		"unkown connection domain");
+		"unknown connection domain");
 	connection_destroy(conn_stub);
 }
 
@@ -797,17 +797,17 @@ static void test_socks5_recv_connect_reply_addr_not_supported(void)
 	socks5_init(NULL, NULL);
 }
 
-static void test_socks5_recv_connect_reply_unkown(void)
+static void test_socks5_recv_connect_reply_unknown(void)
 {
 	int ret;
 	struct connection *conn_stub;
 
 	conn_stub = get_connection_stub();
-	socks5_init(NULL, socks5_recv_connect_reply_ipv4_unkown_stub);
+	socks5_init(NULL, socks5_recv_connect_reply_ipv4_unknown_stub);
 
 	ret = socks5_recv_connect_reply(conn_stub);
 
-	ok(ret == -ECONNABORTED, "socks5 reply unkown code");
+	ok(ret == -ECONNABORTED, "socks5 reply unknown code");
 
 	connection_destroy(conn_stub);
 	socks5_init(NULL, NULL);
@@ -1078,13 +1078,13 @@ static void test_socks5_send_resolve_ptr_request_failure(void)
 	connection_destroy(conn_stub);
 	socks5_init(NULL, NULL);
 
-	/* Unkown domain */
+	/* Unknown domain */
 
 	conn_stub = get_connection_domain_stub();
 
 	ret = socks5_send_resolve_ptr_request(conn_stub, &addr_stub, 3);
 
-	ok(ret == -EINVAL, "socks5 send resolve ptr request unkown domain");
+	ok(ret == -EINVAL, "socks5 send resolve ptr request unknown domain");
 
 	connection_destroy(conn_stub);
 }
@@ -1205,7 +1205,7 @@ int main(int argc, char **argv)
 	test_socks5_recv_connect_reply_ttl_expired();
 	test_socks5_recv_connect_reply_cmd_not_supported();
 	test_socks5_recv_connect_reply_addr_not_supported();
-	test_socks5_recv_connect_reply_unkown();
+	test_socks5_recv_connect_reply_unknown();
 	test_socks5_recv_connect_reply_ipv6_success();
 	test_socks5_send_resolve_request_valid();
 	test_socks5_send_resolve_request_failure();

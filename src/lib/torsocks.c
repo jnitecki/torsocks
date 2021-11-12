@@ -329,7 +329,7 @@ static void tsocks_init(void)
 	init_config();
 
 	/*
-	 * Initalized the onion pool which maps cookie address to hidden service
+	 * Initialized the onion pool which maps cookie address to hidden service
 	 * onion address.
 	 */
 	ret = onion_pool_init(&tsocks_onion_pool,

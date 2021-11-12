@@ -581,7 +581,7 @@ error:
 
 /*
  * Free everything inside a configuration file object. It is the caller
- * responsability to free the object if needed.
+ * responsibility to free the object if needed.
  */
 ATTR_HIDDEN
 void config_file_destroy(struct config_file *conf)

@@ -11,7 +11,7 @@ synchronization is needed since torsocks needs to keep track of per socket
 connection. They are kept in a central registry that every thread needs to
 access.
 
-The reason why it needs to be shared accross threads is because of fd passing.
+The reason why it needs to be shared across threads is because of fd passing.
 It is possible and even not uncommon that threads exchange file descriptor(s) so
 we can't keep a registry of connections using TLS (Thread Local Storage).
 Furthermore, a process could easily, for instance, close(2) a socket within a
