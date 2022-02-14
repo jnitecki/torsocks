@@ -74,7 +74,7 @@ void tsocks_mutex_unlock(tsocks_mutex_t *m)
 
 /*
  * Call the given routine once, and only once. tsocks_once returning
- * guarantees that the routine has succeded.
+ * guarantees that the routine has succeeded.
  */
 void tsocks_once(tsocks_once_t *o, void (*init_routine)(void))
 {

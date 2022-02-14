@@ -106,7 +106,7 @@ case $host in
 	dnl "On OS X (at least in 10.6 and I believe starting at 10.3) the DNS resolution
 	dnl services fail to compile.  This is a result of the addition of BIND9 compatible
 	dnl resolution libraries on OS X that are being picked up by the configure script
-	dnl instead of -lresolv causing the tests for useable resolution services to fail
+	dnl instead of -lresolv causing the tests for usable resolution services to fail
 	dnl thus disabling features like pka auto lookup."
 	LIBS="-lresolv $LIBS"
 	;;

@@ -72,7 +72,7 @@ struct onion_pool {
 	 * Starting base of available cookie. For a range of 127.0.69.64/26, this
 	 * base value would be 64 and the max value in this case is 127.
 	 *
-	 * If the maxium value is reached, the DNS resolution will fail thus never
+	 * If the maximum value is reached, the DNS resolution will fail thus never
 	 * returning any cookie to the caller.
 	 */
 	uint32_t base;

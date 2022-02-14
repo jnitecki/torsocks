@@ -50,7 +50,7 @@ static void close_fds(int *fds, size_t count)
  * Torsocks call for recvmsg(2)
  *
  * We only hijack this call to handle the FD passing between process on Unix
- * socket. If an INET/INET6 socket is recevied, we stop everything because at
+ * socket. If an INET/INET6 socket is received, we stop everything because at
  * that point we can't guarantee traffic going through Tor.
  *
  * Note that we don't rely on the given "msg" structure since it's controlled

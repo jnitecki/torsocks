@@ -62,7 +62,7 @@ LIBC_SOCKET_RET_TYPE tsocks_socket(LIBC_SOCKET_SIG)
 		 * the libc to do DNS resolution which first tries with UDP and then
 		 * with TCP. It's not critical for the user to know that a non TCP
 		 * socket has been denied and since the libc has a fallback that works,
-		 * this message most of the time, simply polutes the application's
+		 * this message most of the time, simply pollutes the application's
 		 * output which can cause issues with external applications parsing the
 		 * output.
 		 */

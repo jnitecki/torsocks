@@ -34,7 +34,7 @@
 
 /*
  * Indicate if the thread recv is ready. 0 means no, 1 means yes and -1 means
- * error occured.
+ * error occurred.
  */
 static volatile int thread_recv_ready;
 
