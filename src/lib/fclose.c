@@ -33,13 +33,18 @@ LIBC_FCLOSE_RET_TYPE tsocks_fclose(LIBC_FCLOSE_SIG)
 
 	if (!fp) {
 		errno = EBADF;
-		goto error;
+		return -1;
 	}
 
 	fd = fileno(fp);
 	if (fd < 0) {
-		/* errno is set to EBADF here by fileno(). */
-		goto error;
+		/* We don't have any bookkeeping to do. Pass through to libc instead of
+		 * just returning an error though; the operation may succeed e.g. if the
+		 * stream refers to an in-memory buffer without an associated file
+		 * descriptor, such as one created using `fopencookie`, `open_memstream`,
+		 * or `fmemopen`. */
+		DBG("Passing through FILE without a valid descriptor to fclose");
+		return tsocks_libc_fclose(fp);
 	}
 
 	DBG("[fclose] Close caught for fd %d", fd);
@@ -66,9 +71,6 @@ LIBC_FCLOSE_RET_TYPE tsocks_fclose(LIBC_FCLOSE_SIG)
 
 	/* Return the original libc fclose. */
 	return tsocks_libc_fclose(fp);
-
-error:
-	return -1;
 }
 
 /*
