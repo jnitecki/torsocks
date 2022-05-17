@@ -32,6 +32,12 @@ LIBC_SOCKET_RET_TYPE tsocks_socket(LIBC_SOCKET_SIG)
 	DBG("[socket] Creating socket with domain %d, type %d and protocol %d",
 			domain, type, protocol);
 
+	if (domain == AF_INET6 && !tsocks_config.enable_ipv6) {
+		DBG("[socket] Denying ipv6");
+		errno = ENOSYS;
+		return -1;
+	}
+
 	if (IS_SOCK_STREAM(type)) {
 		/*
 		 * The socket family is not checked here since we accept local socket

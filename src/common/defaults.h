@@ -73,4 +73,7 @@
 /* Control if torsocks isolates based on PID or not. */
 #define DEFAULT_ISOLATE_PID_ENV     "TORSOCKS_ISOLATE_PID"
 
+/* Control if torsocks supports IPv6 sockets or not. */
+#define DEFAULT_ENABLE_IPV6_ENV     "TORSOCKS_ENABLE_IPV6"
+
 #endif /* TORSOCKS_DEFAULTS_H */
