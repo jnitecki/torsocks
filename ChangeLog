@@ -1,3 +1,15 @@
+2022-05-25 torsocks 2.4.0
+	* Disable ipv6 socket creation by default, fixing #40009 (signal-cli)
+	* Delegate to libc fclose when fileno fails, fixing #40002 (EBADF in mutt)
+	* Fix typos
+	* Add debug-log for opaque syscall passthrough
+	* Pass through non-blacklisted syscalls, fixing "Unsupported syscall number"
+	  errors in #33552 and others.
+	* Fixes an issue when calling recvmsg on a domain socket non-blocking; #40001
+	* Fixed out-of-bounds write in onion pool.
+	* Add getdents / getdents64 support re ticket #28861
+	* Fix a bunch of stuff in the wrapper script, #24967
+
 2018-11-19 torsocks 2.3.0
 	* Fix a bunch of stuff in the wrapper script, #24967
 	* gethostbyaddr_r: always assign result
