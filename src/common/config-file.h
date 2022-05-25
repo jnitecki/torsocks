@@ -90,6 +90,11 @@ struct configuration {
 	 * username or password.
 	 */
 	unsigned int isolate_pid:1;
+
+	/*
+	 * Enable IPv6.
+	 */
+	unsigned int enable_ipv6:1;
 };
 
 int config_file_read(const char *filename, struct configuration *config);
