@@ -18,6 +18,9 @@
  */
 
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <assert.h>
 
 #include <common/log.h>
@@ -62,15 +65,27 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	 * 0;  ai_family to AF_UNSPEC; and ai_flags to (AI_V4MAPPED |
 	 * AI_ADDRCONFIG).
 	 *
-	 * This means that for sure the ai_family will be treated as AF_UNSPEC.
 	 */
-	if (!hints) {
-		tmp_node = node;
-		goto libc_call;
+	struct addrinfo tmp_hints;
+	if (hints) {
+		tmp_hints = *hints;
+	} else {
+		tmp_hints = (struct addrinfo) {
+			.ai_socktype = 0,
+			.ai_protocol = 0,
+			.ai_family = AF_UNSPEC,
+			.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
+		};
 	}
 
+	/*
+	 * Tor doesn't support v4 mapped addresses, so don't request them.
+	 * https://gitlab.torproject.org/tpo/core/tor/-/issues/40611
+	 */
+	tmp_hints.ai_flags &= ~AI_V4MAPPED;
+
 	/* Use right domain for the next step. */
-	switch (hints->ai_family) {
+	switch (tmp_hints.ai_family) {
 	default:
 		/* Default value is to use IPv4. */
 	case AF_INET:
@@ -90,7 +105,7 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	ret = inet_pton(af, node, addr);
 	if (ret == 0) {
 		/* If AI_NUMERICHOST is set, return a error. */
-		if (hints->ai_flags & AI_NUMERICHOST) {
+		if (tmp_hints.ai_flags & AI_NUMERICHOST) {
 			ret = EAI_NONAME;
 			goto error;
 		}
@@ -111,7 +126,14 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	}
 
 libc_call:
-	ret = tsocks_libc_getaddrinfo(tmp_node, service, hints, res);
+	/*
+	 * Ensure the native call never performs a network lookup.
+	 * *Shouldn't* be necessary since we already converted the address to
+	 * a numeric address string, but a useful extra safeguard.
+	 */
+	tmp_hints.ai_flags |= AI_NUMERICHOST;
+
+	ret = tsocks_libc_getaddrinfo(tmp_node, service, &tmp_hints, res);
 	if (ret) {
 		goto error;
 	}
