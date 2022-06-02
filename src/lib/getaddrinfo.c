@@ -18,6 +18,9 @@
  */
 
 #include <arpa/inet.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <assert.h>
 
 #include <common/log.h>
@@ -62,11 +65,15 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	 * 0;  ai_family to AF_UNSPEC; and ai_flags to (AI_V4MAPPED |
 	 * AI_ADDRCONFIG).
 	 *
-	 * This means that for sure the ai_family will be treated as AF_UNSPEC.
 	 */
+	struct addrinfo default_hints = {
+		.ai_socktype = 0,
+		.ai_protocol = 0,
+		.ai_family = AF_UNSPEC,
+		.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
+	};
 	if (!hints) {
-		tmp_node = node;
-		goto libc_call;
+		hints = &default_hints;
 	}
 
 	/* Use right domain for the next step. */
