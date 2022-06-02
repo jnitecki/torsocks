@@ -66,18 +66,26 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	 * AI_ADDRCONFIG).
 	 *
 	 */
-	struct addrinfo default_hints = {
-		.ai_socktype = 0,
-		.ai_protocol = 0,
-		.ai_family = AF_UNSPEC,
-		.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
-	};
-	if (!hints) {
-		hints = &default_hints;
+	struct addrinfo tmp_hints;
+	if (hints) {
+		tmp_hints = *hints;
+	} else {
+		tmp_hints = (struct addrinfo) {
+			.ai_socktype = 0,
+			.ai_protocol = 0,
+			.ai_family = AF_UNSPEC,
+			.ai_flags = AI_V4MAPPED | AI_ADDRCONFIG,
+		};
 	}
 
+	/*
+	 * Tor doesn't support v4 mapped addresses, so don't request them.
+	 * https://gitlab.torproject.org/tpo/core/tor/-/issues/40611
+	 */
+	tmp_hints.ai_flags &= ~AI_V4MAPPED;
+
 	/* Use right domain for the next step. */
-	switch (hints->ai_family) {
+	switch (tmp_hints.ai_family) {
 	default:
 		/* Default value is to use IPv4. */
 	case AF_INET:
@@ -97,7 +105,7 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	ret = inet_pton(af, node, addr);
 	if (ret == 0) {
 		/* If AI_NUMERICHOST is set, return a error. */
-		if (hints->ai_flags & AI_NUMERICHOST) {
+		if (tmp_hints.ai_flags & AI_NUMERICHOST) {
 			ret = EAI_NONAME;
 			goto error;
 		}
