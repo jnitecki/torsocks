@@ -126,7 +126,14 @@ LIBC_GETADDRINFO_RET_TYPE tsocks_getaddrinfo(LIBC_GETADDRINFO_SIG)
 	}
 
 libc_call:
-	ret = tsocks_libc_getaddrinfo(tmp_node, service, hints, res);
+	/*
+	 * Ensure the native call never performs a network lookup.
+	 * *Shouldn't* be necessary since we already converted the address to
+	 * a numeric address string, but a useful extra safeguard.
+	 */
+	tmp_hints.ai_flags |= AI_NUMERICHOST;
+
+	ret = tsocks_libc_getaddrinfo(tmp_node, service, &tmp_hints, res);
 	if (ret) {
 		goto error;
 	}
