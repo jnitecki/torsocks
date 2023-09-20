@@ -109,6 +109,7 @@ int conf_file_set_allow_inbound(const char *val, struct configuration *config);
 int conf_file_set_allow_outbound_localhost(const char *val, struct
 		configuration *config);
 int conf_file_set_isolate_pid(const char *val, struct configuration *config);
+int conf_file_set_enable_ipv6(const char *val, struct configuration *config);
 
 int conf_apply_socks_auth(struct configuration *config);
 
