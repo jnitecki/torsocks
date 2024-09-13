@@ -22,6 +22,14 @@
 #if (defined(__linux__) || defined(__GLIBC__) || defined(__FreeBSD__) || \
 		defined(__darwin__) || defined(__NetBSD__))
 
+/* Inline the strl functions if the platform doesn't have them. */
+#ifndef HAVE_STRLCPY
+#include "ext/strlcpy.c"
+#endif
+#ifndef HAVE_STRLCAT
+#include "ext/strlcat.c"
+#endif
+
 /*
  * Initialize a pthread mutex. This never fails.
  */

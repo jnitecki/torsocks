@@ -58,6 +58,9 @@ AC_CHECK_FUNCS(strcspn strdup strerror strcasecmp strncasecmp mmap munmap \
 	[AC_MSG_ERROR("Required function not found")]
 )
 
+dnl Checks for optional library functions.
+AC_CHECK_FUNCS(strlcpy strlcat)
+
 ##############################################################################
 # 3. Determine libraries we need to include when linking libtorsocks.
 #    OpenBSD and OSX have some special requirements here.
