@@ -1,0 +1,59 @@
+# These variables are set everywhere, unconditionally.
+variables:
+  TERM: "ansi"
+  DEBUG_CI: "yes"
+
+# This template is used for x86-64 builds.
+.x86-64-template: &x86-64-template
+  tags:
+    - amd64
+
+# This template should be usable on any system that's based on apt.
+.apt-template: &apt-template |
+      export LC_ALL=C.UTF-8
+      echo Etc/UTC > /etc/timezone
+      mkdir -p apt-cache
+      export APT_CACHE_DIR="$(pwd)/apt-cache"
+      rm -f /etc/apt/apt.conf.d/docker-clean
+      echo 'quiet "1";' \
+           'Acquire::Retries "20";' \
+           'APT::Install-Recommends "0";' \
+           'APT::Install-Suggests "0";' \
+           'APT::Get::Assume-Yes "true";' \
+           'Dpkg::Use-Pty "0";' \
+           "Dir::Cache::Archives \"${APT_CACHE_DIR}\"; " \
+        >> /etc/apt/apt.conf.d/99gitlab
+      apt-get update -qq
+      apt-get upgrade -qy
+
+# This template sets us up for Debian system in particular.
+.debian-template: &debian-template
+  <<: *x86-64-template
+  variables:
+    DEBIAN_FRONTEND: "noninteractive"
+  before_script:
+    - *apt-template
+
+# Minimal check on debian: just make, make check.
+.build-template: &build-template
+  image: amd64/debian:bookworm
+  <<: *debian-template
+  script:
+  - apt-get install -qq autotools-dev pkg-config automake autoconf libtool make gcc
+  - ./autogen.sh
+  - ./configure
+  - make
+  - make check
+  artifacts:
+    expire_in: 1 week
+    when: always
+    paths:
+      - config.log
+
+debian-minimal:
+  <<: *build-template
+
+debian-minimal-i386:
+  <<: *build-template
+  image: i386/debian:bookworm
+  tags:
