@@ -186,8 +186,7 @@ struct onion_entry *onion_entry_create(struct onion_pool *pool,
 	}
 
 	/* Copy hostname and force NULL byte at the end. */
-	strncpy(entry->hostname, onion_name, sizeof(entry->hostname));
-	entry->hostname[sizeof(entry->hostname) - 1] = '\0';
+	strlcpy(entry->hostname, onion_name, sizeof(entry->hostname));
 
 	/*
 	 * Create the new IP from the onion pool which will be the cookie returned
