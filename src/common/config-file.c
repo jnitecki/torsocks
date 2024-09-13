@@ -285,6 +285,7 @@ int conf_file_set_tor_address(const char *addr, struct configuration *config)
 		if (ret != 1) {
 			/* At this point, the addr is either v4 nor v6 so error. */
 			ERR("Config file unknown tor address: %s", addr);
+			ret = -EAFNOSUPPORT;
 			goto error;
 		}
 		config->conf_file.tor_domain = CONNECTION_DOMAIN_INET6;
