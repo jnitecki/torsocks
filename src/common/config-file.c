@@ -277,17 +277,15 @@ int conf_file_set_tor_address(const char *addr, struct configuration *config)
 	assert(addr);
 	assert(config);
 
-	ret = utils_is_address_ipv4(addr);
-	if (ret == 1 ) {
+	if (utils_is_address_ipv4(addr) == 1) {
 		config->conf_file.tor_domain = CONNECTION_DOMAIN_INET;
-	} else {
-		ret = utils_is_address_ipv6(addr);
-		if (ret != 1) {
-			/* At this point, the addr is either v4 nor v6 so error. */
-			ERR("Config file unknown tor address: %s", addr);
-			goto error;
-		}
+	} else if (utils_is_address_ipv6(addr) == 1) {
 		config->conf_file.tor_domain = CONNECTION_DOMAIN_INET6;
+	} else {
+		/* At this point, the addr is either v4 nor v6 so error. */
+		ERR("Config file unknown tor address: %s", addr);
+		ret = -EAFNOSUPPORT;
+		goto error;
 	}
 
 	if (config->conf_file.tor_address != NULL) {
