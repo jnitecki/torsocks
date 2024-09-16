@@ -31,6 +31,13 @@
 
 #include <pthread.h>
 
+#ifndef HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t siz);
+#endif
+#ifndef HAVE_STRLCPY
+size_t strlcpy(char *dst, const char *src, size_t siz);
+#endif
+
 typedef struct tsocks_mutex_t {
 	pthread_mutex_t mutex;
 } tsocks_mutex_t;

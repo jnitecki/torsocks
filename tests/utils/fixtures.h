@@ -21,7 +21,10 @@
 #ifndef FIXTURES_H
 #define FIXTURES_H
 
+#include <assert.h>
 #include <string.h>
+
+#include "common/compat.h"
 
 #if !defined(TORSOCKS_FIXTURE_PATH)
 #define TORSOCKS_FIXTURE_PATH	0
@@ -30,11 +33,12 @@
 static const char *fixture_path(const char *base, const char *filename)
 {
 	static char path[1024];
-	size_t path_len;
+	size_t src_len;
 
-	path_len = strlen(base);
-	strncpy(path, base, path_len);
-	strncpy(path + path_len, filename, sizeof(path) - path_len);
+	src_len = strlcpy(path, base, sizeof(path));
+	assert(src_len < sizeof(path));
+	src_len = strlcpy(path, filename, sizeof(path));
+	assert(src_len < sizeof(path));
 
 	return path;
 }

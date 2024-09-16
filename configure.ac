@@ -54,9 +54,12 @@ AC_CHECK_HEADERS(dlfcn.h sys/syscall.h sys/socket.h arpa/inet.h \
 dnl Checks for required library functions.
 AC_CHECK_FUNCS(strcspn strdup strerror strcasecmp strncasecmp mmap munmap \
                socket connect close syscall recv send memset memcpy strlen \
-               strncpy strcmp malloc calloc strstr strtoul free,,
+               strcmp malloc calloc strstr strtoul free,,
 	[AC_MSG_ERROR("Required function not found")]
 )
+
+dnl Checks for optional library functions.
+AC_CHECK_FUNCS(strlcpy strlcat)
 
 ##############################################################################
 # 3. Determine libraries we need to include when linking libtorsocks.

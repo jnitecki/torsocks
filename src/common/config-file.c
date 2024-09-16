@@ -322,14 +322,15 @@ int conf_file_set_socks5_user(const char *username,
 	assert(username);
 	assert(config);
 
-	if (strlen(username) > sizeof(config->conf_file.socks5_username)) {
+	if (strlcpy(config->conf_file.socks5_username, username,
+	            sizeof(config->conf_file.socks5_username))
+		>= sizeof(config->conf_file.socks5_username)) {
 		ERR("[config] Invalid %s value for %s", username,
 				conf_socks5_user_str);
 		ret = -EINVAL;
 		goto error;
 	}
 
-	strncpy(config->conf_file.socks5_username, username, strlen(username));
 	if (++both_socks5_pass_user_set == 2) {
 		config->socks5_use_auth = 1;
 	}
@@ -354,14 +355,15 @@ int conf_file_set_socks5_pass(const char *password,
 	assert(password);
 	assert(config);
 
-	if (strlen(password) > sizeof(config->conf_file.socks5_password)) {
+	if (strlcpy(config->conf_file.socks5_password, password,
+	            sizeof(config->conf_file.socks5_password))
+		>= sizeof(config->conf_file.socks5_password)) {
 		ERR("[config] Invalid %s value for %s", password,
 				conf_socks5_pass_str);
 		ret = -EINVAL;
 		goto error;
 	}
 
-	strncpy(config->conf_file.socks5_password, password, strlen(password));
 	if (++both_socks5_pass_user_set == 2) {
 		config->socks5_use_auth = 1;
 	}
