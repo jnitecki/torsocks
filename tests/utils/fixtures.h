@@ -37,7 +37,7 @@ static const char *fixture_path(const char *base, const char *filename)
 
 	src_len = strlcpy(path, base, sizeof(path));
 	assert(src_len < sizeof(path));
-	src_len = strlcpy(path, filename, sizeof(path));
+	src_len = strlcat(path, filename, sizeof(path));
 	assert(src_len < sizeof(path));
 
 	return path;
