@@ -450,11 +450,11 @@ static void test_inet_socket(void)
 	void *status;
 	pthread_t th[2];
 	struct sockaddr_in addr;
-	const char *ip = "138.201.14.197";
+	const char *ip = "116.202.120.165";
 
 	/*
 	 * First of all, we are going to try to create an inet socket to a public
-	 * known IP being www.torproject.org --> 138.201.14.197.
+	 * known IP being web-fsn-01.torproject.org --> 116.202.120.165.
 	 */
 	inet_sock = socket(AF_INET, SOCK_STREAM, 0);
 	if (inet_sock < 0) {
