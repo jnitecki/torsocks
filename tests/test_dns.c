@@ -204,5 +204,5 @@ int main(int argc, char **argv)
 	test_getaddrinfo(&tor_localhost);
 
 end:
-	return 0;
+	return exit_status();
 }

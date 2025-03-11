@@ -115,5 +115,5 @@ int main(int argc, char **argv)
 	test_getpeername();
 
 end:
-    return 0;
+	return exit_status();
 }

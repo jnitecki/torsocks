@@ -525,5 +525,5 @@ int main(int argc, char **argv)
 	test_inet_socket();
 
 end:
-	return 0;
+	return exit_status();
 }

@@ -93,5 +93,5 @@ int main(int argc, char **argv)
 
 	test_connect_deny();
 
-    return 0;
+	return exit_status();
 }
