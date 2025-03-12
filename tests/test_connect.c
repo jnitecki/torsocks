@@ -38,52 +38,64 @@ static void test_connect_deny(void)
 
 	fd = tsocks_libc_socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
 	ret = connect(fd, (struct sockaddr *) &sin, sizeof(sin));
-	ok (ret == -1 && errno == EBADF, "Connect with RAW socket NOT valid");
+	ok (ret == -1 && errno == EBADF,
+	    "Connect with RAW socket NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	sin.sin_family = AF_INET;
 	fd = tsocks_libc_socket(sin.sin_family, SOCK_DGRAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin, sizeof(sin));
-	ok (ret == -1 && errno == EPERM, "Connect with UDP socket NOT valid");
+	ok (ret == -1 && errno == EPERM,
+	    "Connect with UDP socket NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	inet_pton(sin.sin_family, "0.0.0.0", &sin.sin_addr);
 	fd = tsocks_libc_socket(sin.sin_family, SOCK_STREAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin, sizeof(sin));
 	ok (ret == -1 && errno == EPERM,
-			"Connect with ANY address is NOT valid.");
+	    "Connect with ANY address is NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	inet_pton(sin.sin_family, "127.0.0.1", &sin.sin_addr);
 	fd = tsocks_libc_socket(sin.sin_family, SOCK_STREAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin, sizeof(sin));
 	ok (ret == -1 && errno == EPERM,
-			"Connect with local address is NOT valid.");
+	    "Connect with local address is NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	sin6.sin6_family = AF_INET6;
 	fd = tsocks_libc_socket(sin6.sin6_family, SOCK_DGRAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin6, sizeof(sin6));
-	ok (ret == -1 && errno == EPERM, "Connect with UDPv6 socket NOT valid");
+	ok (ret == -1 && errno == EPERM,
+	    "Connect with UDPv6 socket NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	inet_pton(sin6.sin6_family, "::", &sin6.sin6_addr);
 	fd = tsocks_libc_socket(sin6.sin6_family, SOCK_STREAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin6, sizeof(sin6));
 	ok (ret == -1 && errno == EPERM,
-			"Connect with ANYv6 address is NOT valid.");
+	    "Connect with ANYv6 address is NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	inet_pton(sin6.sin6_family, "::1", &sin6.sin6_addr);
 	fd = tsocks_libc_socket(sin6.sin6_family, SOCK_STREAM, 0);
 	ret = connect(fd, (struct sockaddr *) &sin6, sizeof(sin6));
 	ok (ret == -1 && errno == EPERM,
-			"Connect with local v6 address is NOT valid.");
+	    "Connect with local v6 address is NOT valid. ret=%d, errno=%d: %s",
+	    ret, errno, strerror(errno));
 	close(fd);
 
 	/* Bad fd. */
 	ret = connect(42, (struct sockaddr *) &sin, 42);
-	ok (ret == -1 && errno == EBADF, "Bad socket FD");
+	ok (ret == -1 && errno == EBADF,
+	    "Bad socket FD. ret=%d errno=%d: %s",
+	    ret, errno, strerror(errno));
 }
 
 int main(int argc, char **argv)
