@@ -35,7 +35,8 @@ static void test_getpeername(void)
 	struct sockaddr_in addrv4;
 	struct sockaddr_storage ss;
 	socklen_t addrlen;
-	const char *ip = "128.31.0.39";
+	/* perdulce.torproject.org */
+	const char *ip = "49.12.57.140";
 
 	ret = pipe(pipe_fds);
 	if (ret < 0) {
@@ -60,7 +61,7 @@ static void test_getpeername(void)
 
 	/* Connect socket through Tor so we can test the wrapper. */
 	addrv4.sin_family = AF_INET;
-	addrv4.sin_port = htons(9131);
+	addrv4.sin_port = htons(80);
 	inet_pton(addrv4.sin_family, ip, &addrv4.sin_addr);
 	memset(addrv4.sin_zero, 0, sizeof(addrv4.sin_zero));
 
