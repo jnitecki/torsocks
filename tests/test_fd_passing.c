@@ -36,6 +36,8 @@
  * Indicate if the thread recv is ready. 0 means no, 1 means yes and -1 means
  * error occurred.
  */
+const int THREAD_RECV_READY_FOR_DATA = 1;
+const int THREAD_RECV_READY_FOR_FDS = 2;
 static volatile int thread_recv_ready;
 
 /* Unix socket for this test. */
@@ -347,7 +349,7 @@ void *thread_recv(void *data)
 	}
 
 	/* Notify we are ready to test. */
-	thread_recv_ready = 1;
+	thread_recv_ready = THREAD_RECV_READY_FOR_DATA;
 
 	new_sock = accept_unix_sock(sock);
 	if (new_sock < 0) {
@@ -366,6 +368,9 @@ void *thread_recv(void *data)
 	OK(len == sizeof(buf) &&
 		strncmp(buf, "hello", sizeof(buf)) == 0,
 		"Data received successfully");
+
+	/* Notify we are ready for next test. */
+	thread_recv_ready = THREAD_RECV_READY_FOR_FDS;
 
 	len = recv_fds_unix_sock(new_sock, fds, 3);
 	if (len < 0) {
@@ -389,8 +394,15 @@ error:
 
 void *thread_send(void *data)
 {
-	int sock, fds[3], pipe_fds[2] = {-1, -1};
+	int sock=-1, fds[3], pipe_fds[2] = {-1, -1};
 	ssize_t len;
+
+	/* Active wait for the thread recv to be ready. */
+	while (thread_recv_ready != THREAD_RECV_READY_FOR_DATA) {
+		if (thread_recv_ready == -1) {
+			goto error;
+		}
+	}
 
 	sock = connect_unix_sock(sockpath);
 	if (sock < 0) {
@@ -414,6 +426,12 @@ void *thread_send(void *data)
 	 * We are going to pass 3 fds, two of them are pipse in position 0 and 2
 	 * and the inet socket is at position 1.
 	 */
+	/* Active wait for the thread recv to be ready. */
+	while (thread_recv_ready != THREAD_RECV_READY_FOR_FDS) {
+		if (thread_recv_ready == -1) {
+			goto error;
+		}
+	}
 	fds[0] = pipe_fds[0];
 	fds[1] = *((int *)data);
 	fds[2] = pipe_fds[1];
@@ -478,15 +496,6 @@ static void test_inet_socket(void)
 	ret = pthread_create(&th[0], NULL, thread_recv, NULL);
 	if (ret < 0) {
 		fail("pthread_create thread recv");
-		goto error;
-	}
-
-	/* Active wait for the thread recv to be ready. */
-	while (thread_recv_ready == 0) {
-		continue;
-	}
-
-	if (thread_recv_ready == -1) {
 		goto error;
 	}
 
