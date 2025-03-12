@@ -150,5 +150,5 @@ int main(int argc, char **argv)
 	test_connection_creation();
 	test_connection_usage();
 
-    return 0;
+	return exit_status();
 }

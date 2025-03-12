@@ -176,5 +176,5 @@ int main(int argc, char **argv)
 	test_onion_init(&pool);
 	test_onion_entry(&pool);
 
-    return 0;
+	return exit_status();
 }

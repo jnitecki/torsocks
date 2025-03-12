@@ -66,5 +66,5 @@ int main(int argc, char **argv)
 
 	test_socket_stream();
 
-    return 0;
+	return exit_status();
 }
