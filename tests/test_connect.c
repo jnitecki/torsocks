@@ -33,15 +33,18 @@ int tsocks_loglevel = MSGNONE;
 static void test_connect_deny(void)
 {
 	int fd, ret;
-	struct sockaddr_in sin;
-	struct sockaddr_in6 sin6;
+	struct sockaddr_in sin = {0};
+	struct sockaddr_in6 sin6 = {0};
 
 	fd = tsocks_libc_socket(AF_INET, SOCK_RAW, IPPROTO_TCP);
+	skip_start(fd == -1, 1, "Couldn't create raw socket");
+	sin.sin_family = AF_INET;
 	ret = connect(fd, (struct sockaddr *) &sin, sizeof(sin));
-	ok (ret == -1 && errno == EBADF,
+	ok (ret == -1 && errno == EPERM,
 	    "Connect with RAW socket NOT valid. ret=%d, errno=%d: %s",
 	    ret, errno, strerror(errno));
 	close(fd);
+	skip_end();
 
 	sin.sin_family = AF_INET;
 	fd = tsocks_libc_socket(sin.sin_family, SOCK_DGRAM, 0);
