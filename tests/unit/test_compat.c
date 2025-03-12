@@ -24,7 +24,7 @@
 
 #include <tap/tap.h>
 
-#define NUM_TESTS 7
+#define NUM_TESTS 8
 
 static void test_socket_stream(void)
 {
@@ -57,6 +57,10 @@ static void test_socket_stream(void)
 	type = SOCK_RAW;
 	ret = IS_SOCK_STREAM(type);
 	ok (ret == 0, "Type SOCK_RAW is NOT a stream socket");
+
+	type = SOCK_RAW;
+	ret = IS_SOCK_DGRAM(type);
+	ok (ret == 0, "Type SOCK_RAW is NOT a datagram socket");
 }
 
 int main(int argc, char **argv)
@@ -66,5 +70,5 @@ int main(int argc, char **argv)
 
 	test_socket_stream();
 
-    return 0;
+	return exit_status();
 }

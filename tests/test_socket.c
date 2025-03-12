@@ -118,6 +118,5 @@ int main(int argc, char **argv)
 
 	test_socket_types();
 	test_socketpair_types();
-
-    return 0;
+	return exit_status();
 }

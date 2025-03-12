@@ -13,6 +13,10 @@ TEST_LOG_DRIVER = env AM_TAP_AWK='$(AWK)' $(SHELL) $(TAP_DRIVER)
 
 AM_CFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/src -I$(top_srcdir)/tests/utils/ -I$(srcdir)
 
+AM_TESTS_ENVIRONMENT = \
+	## Enable (experimental) ipv6 support
+	TORSOCKS_ENABLE_IPV6=1
+
 LIBTAP=$(top_builddir)/tests/utils/tap/libtap.la
 
 LIBTORSOCKS=$(top_builddir)/src/lib/libtorsocks.la

@@ -36,8 +36,11 @@ variables:
 
 # Minimal check on debian: just make, make check.
 .build-template: &build-template
-  image: amd64/debian:bookworm
   <<: *debian-template
+  image:
+    name: containers.torproject.org/tpo/tpa/base-images/debian:bookworm
+    docker:
+      platform: linux/amd64
   script:
   - apt-get install -qq autotools-dev pkg-config automake autoconf libtool make gcc
   - ./autogen.sh
@@ -49,11 +52,16 @@ variables:
     when: always
     paths:
       - config.log
+      - tests/**/*.log
 
 debian-minimal:
   <<: *build-template
 
 debian-minimal-i386:
   <<: *build-template
-  image: i386/debian:bookworm
+  image:
+    # TODO: Use TPA registry when 386 arch is available there
+    name: i386/debian:bookworm
+    docker:
+      platform: linux/386
   tags:
