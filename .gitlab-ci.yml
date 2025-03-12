@@ -49,6 +49,7 @@ variables:
     when: always
     paths:
       - config.log
+      - tests/**/*.log
 
 debian-minimal:
   <<: *build-template
