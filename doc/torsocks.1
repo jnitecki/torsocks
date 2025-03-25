@@ -48,7 +48,7 @@ Note that you MUST have a username set either by the command line, environment
 variable or configuration file (torsocks.conf(5)).
 .TP
 .BR "\-a, \-\-address"
-Set Tor address.
+Set Tor address. Accepts only numeric addresses.
 .TP
 .BR "\-P, \-\-port"
 Set Tor port.
@@ -57,6 +57,9 @@ Set Tor port.
 Automatic tor isolation. Set the username and password for the SOCKS5
 authentication method to a PID/current time based value automatically. Username
 and Password MUST NOT be set.
+.TP
+.BR "\-6, \-\-ipv6"
+Enable creation of ipv6 sockets.
 .TP
 .BR "\-d, \-\-debug"
 Activate the debug mode. Output will be written on stderr.
