@@ -1,3 +1,15 @@
+2025-03-25 torsocks 2.5.0
+	* Better getaddrinfo behavior with NULL hints; MR !7.
+	* Fixed inconsistent version number; MR !8.
+	* Fixed C99 compatibility; MR !9, fixing issue #40024.
+	* Clarify that hostnames are not supported for `TORSOCKS_TOR_ADDRESS`
+	  in torsocks.8 (MR !11), and `-a` command line flag (MR !12).
+	* Replaces strncpy usage with strlcpy; MR !14.
+	* Reject unrecognized address types, particularly from the --address
+	  command-line argument; MR !13, fixing #40025.
+	* Fix `make check` tests; MR !16 and !19.
+	* Update torsocks.1 (MR !20).
+
 2022-05-25 torsocks 2.4.0
 	* Disable ipv6 socket creation by default, fixing #40009 (signal-cli)
 	* Delegate to libc fclose when fileno fails, fixing #40002 (EBADF in mutt)
