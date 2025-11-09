@@ -1,0 +1,83 @@
+name: Build & Test (Autotools + GCC)
+
+on:
+  push:
+    branches: [main]          # change as needed
+  pull_request:
+    branches: [main]          # build PRs too
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # --------------------------------------------------------------------
+      # 1. Checkout the repo
+      # --------------------------------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # --------------------------------------------------------------------
+      # 2. Install build‑time dependencies
+      # --------------------------------------------------------------------
+      - name: Install autotools & compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config  # useful for many autotools projects
+
+      # --------------------------------------------------------------------
+      # 3. (Optional) Cache the autotools cache if you have many sub‑packages
+      # --------------------------------------------------------------------
+      - name: Cache autotools build
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache
+            /usr/share/aclocal
+          key: ${{ runner.os }}-autotools-${{ hashFiles('configure.ac', 'Makefile.am') }}
+          restore-keys: |
+            ${{ runner.os }}-autotools-
+
+      # --------------------------------------------------------------------
+      # 4. Run the autotools pipeline
+      # --------------------------------------------------------------------
+      - name: Autoconf
+        run: autoreconf -f -i
+
+      - name: Libtoolize
+        run: libtoolize --copy --force
+
+      - name: Automake
+        run: automake --add-missing
+
+      - name: Configure
+        run: ./configure
+
+      # --------------------------------------------------------------------
+      # 5. Build with GCC (via make)
+      # --------------------------------------------------------------------
+      - name: Build
+        run: make -j$(nproc)
+
+      # --------------------------------------------------------------------
+      # 6. (Optional) Run tests if you have a test suite
+      # --------------------------------------------------------------------
+      - name: Test
+        run: make check
+        continue-on-error: true   # set to false if tests must pass
+
+      # --------------------------------------------------------------------
+      # 7. (Optional) Upload build artifacts
+      # --------------------------------------------------------------------
+      - name: Upload binaries
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: binaries
+          path: |
+            bin/
+            lib/
