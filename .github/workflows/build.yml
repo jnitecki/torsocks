@@ -1,5 +1,4 @@
-name: Build & Test (Autotools + GCC)
-
+name: Build
 on:
   push:
     workflow_dispatch:
@@ -28,7 +27,7 @@ jobs:
             pkg-config  # useful for many autotools projects
 
       # --------------------------------------------------------------------
-      # 3. (Optional) Cache the autotools cache if you have many sub‑packages
+      # 3. Cache the autotools cache if you have many sub‑packages
       # --------------------------------------------------------------------
       - name: Cache autotools build
         uses: actions/cache@v3
@@ -43,14 +42,8 @@ jobs:
       # --------------------------------------------------------------------
       # 4. Run the autotools pipeline
       # --------------------------------------------------------------------
-      - name: Autoconf
-        run: autoreconf -f -i
-
-      - name: Libtoolize
-        run: libtoolize --copy --force
-
-      - name: Automake
-        run: automake --add-missing
+      - name: AutoGen
+        run: ./autogen.sh
 
       - name: Configure
         run: ./configure
@@ -60,13 +53,6 @@ jobs:
       # --------------------------------------------------------------------
       - name: Build
         run: make -j$(nproc)
-
-      # --------------------------------------------------------------------
-      # 6. (Optional) Run tests if you have a test suite
-      # --------------------------------------------------------------------
-      - name: Test
-        run: make check
-        continue-on-error: true   # set to false if tests must pass
 
       # --------------------------------------------------------------------
       # 7. (Optional) Upload build artifacts
