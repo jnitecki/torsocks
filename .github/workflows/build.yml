@@ -27,20 +27,7 @@ jobs:
             pkg-config  # useful for many autotools projects
 
       # --------------------------------------------------------------------
-      # 3. Cache the autotools cache if you have many sub‑packages
-      # --------------------------------------------------------------------
-      - name: Cache autotools build
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache
-            /usr/share/aclocal
-          key: ${{ runner.os }}-autotools-${{ hashFiles('configure.ac', 'Makefile.am') }}
-          restore-keys: |
-            ${{ runner.os }}-autotools-
-
-      # --------------------------------------------------------------------
-      # 4. Run the autotools pipeline
+      # 3. Run the autotools pipeline
       # --------------------------------------------------------------------
       - name: AutoGen
         run: ./autogen.sh
@@ -49,13 +36,19 @@ jobs:
         run: ./configure
 
       # --------------------------------------------------------------------
-      # 5. Build with GCC (via make)
+      # 4. Build with GCC (via make)
       # --------------------------------------------------------------------
       - name: Build
         run: make -j$(nproc)
 
       # --------------------------------------------------------------------
-      # 7. (Optional) Upload build artifacts
+      # 5. Create upload folder and copy files
+      # --------------------------------------------------------------------
+      - name: Create upload folder
+        run: mkdir -p "${RUNNER_TEMP}/upload" && cp src/lib/.libs/libtorsocks.so "${RUNNER_TEMP}/upload/" && cp src/bin/torsocks "${RUNNER_TEMP}/upload/"
+
+      # --------------------------------------------------------------------
+      # 5. (Optional) Upload build artifacts
       # --------------------------------------------------------------------
       - name: Upload binaries
         if: success()
@@ -63,5 +56,4 @@ jobs:
         with:
           name: binaries
           path: |
-            src/lib/.libs/libtorsocks.so
-            src/bin/torsocks
+            ${RUNNER_TEMP}/upload/
