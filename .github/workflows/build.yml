@@ -63,5 +63,5 @@ jobs:
         with:
           name: binaries
           path: |
-            bin/
-            lib/
+            src/lib/.libs/libtorsocks.so
+            src/bin/torsocks
