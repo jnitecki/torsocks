@@ -50,12 +50,6 @@ jobs:
       - name: Print directory 1
         run: ls -al "${RUNNER_TEMP}/upload"
 
-      - name: Print directory 1
-        run: ls -al "/home/runner/work/_temp/upload"
-
-      - name: List files in source and copied ones
-        run: ls -al "${RUNNER_TEMP}/upload" && ls -al src/lib/.libs/ && ls -al src/bin/torsocks
-
       # --------------------------------------------------------------------
       # 5. (Optional) Upload build artifacts
       # --------------------------------------------------------------------
@@ -64,5 +58,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binaries
-          path: |
-            ${RUNNER_TEMP}/upload/
+          path: ${RUNNER_TEMP}/upload
