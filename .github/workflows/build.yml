@@ -47,11 +47,8 @@ jobs:
       - name: Create upload folder and copy files
         run: echo "${RUNNER_TEMP}/upload" && mkdir -p "${RUNNER_TEMP}/upload" && cp src/lib/.libs/libtorsocks.so "${RUNNER_TEMP}/upload/" && cp src/bin/torsocks "${RUNNER_TEMP}/upload/"
 
-      - name: Print directory 1
-        run: ls -al "${{ runner.temp }}/upload"
-
       # --------------------------------------------------------------------
-      # 5. (Optional) Upload build artifacts
+      # 6. Upload build artifacts
       # --------------------------------------------------------------------
       - name: Upload binaries
         if: success()
