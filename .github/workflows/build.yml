@@ -48,7 +48,7 @@ jobs:
         run: echo "${RUNNER_TEMP}/upload" && mkdir -p "${RUNNER_TEMP}/upload" && cp src/lib/.libs/libtorsocks.so "${RUNNER_TEMP}/upload/" && cp src/bin/torsocks "${RUNNER_TEMP}/upload/"
 
       - name: Print directory 1
-        run: ls -al "${RUNNER_TEMP}/upload"
+        run: ls -al "${{ runner.temp }}/upload"
 
       # --------------------------------------------------------------------
       # 5. (Optional) Upload build artifacts
@@ -58,5 +58,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: binaries
-          path: "${{ env.RUNNER_TEMP }}/upload/"
+          path: "${{ runner.temp }}/upload/"
           if-no-files-found: error
