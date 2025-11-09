@@ -2,9 +2,7 @@ name: Build & Test (Autotools + GCC)
 
 on:
   push:
-    branches: [main]          # change as needed
-  pull_request:
-    branches: [main]          # build PRs too
+    workflow_dispatch:
 
 jobs:
   build:
