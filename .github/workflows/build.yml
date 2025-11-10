@@ -1,0 +1,74 @@
+name: Build
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to build (e.g. v1.2.3)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+        
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # -----------------------------------------------------------------
+      # 1. Checkout the **exact tag** that we’re about to release
+      # -----------------------------------------------------------------
+      - name: Checkout tag ${{ inputs.tag }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}   # pulls the commit that the tag points at
+
+      # --------------------------------------------------------------------
+      # 2. Install build‑time dependencies
+      # --------------------------------------------------------------------
+      - name: Install autotools & compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            autoconf \
+            automake \
+            libtool \
+            pkg-config  # useful for many autotools projects
+
+      # --------------------------------------------------------------------
+      # 3. Run the autotools pipeline
+      # --------------------------------------------------------------------
+      - name: AutoGen
+        run: ./autogen.sh
+
+      - name: Configure
+        run: ./configure
+
+      # --------------------------------------------------------------------
+      # 4. Build with GCC (via make)
+      # --------------------------------------------------------------------
+      - name: Build
+        run: |
+          make -j$(nproc)
+
+      # --------------------------------------------------------------------
+      # 5. Create upload folder and copy files
+      # --------------------------------------------------------------------
+      - name: Create tar
+        run: |
+          mkdir -p "${RUNNER_TEMP}/binaries"
+          chmod u+x src/bin/torsocks;
+          tar czhf "${RUNNER_TEMP}/binaries/linux-amd64.tar.gz" -C src/lib/.libs libtorsocks.so -C ../../../src/bin torsocks
+
+      # --------------------------------------------------------------------
+      # 6. Upload build artifacts
+      # --------------------------------------------------------------------
+      - name: Upload binaries
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: "${{ runner.temp }}/binaries/"
+          if-no-files-found: error

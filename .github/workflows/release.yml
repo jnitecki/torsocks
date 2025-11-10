@@ -1,0 +1,111 @@
+name: Build and Release
+on:
+  workflow_dispatch:
+  workflow_call:
+
+#-----------------------------------------------------------------------
+#  1️⃣  Detect the newest tag and whether a release already exists
+#-----------------------------------------------------------------------
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   # allows creating releases, pushing tags, etc.
+    outputs:
+      last_tag:       ${{ steps.last-tag.outputs.tag }}
+      release_exists: ${{ steps.check-release.outputs.exists }}
+    
+    steps:
+      # Grab the entire history + all tags (needed for `git describe`)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 1. Find the newest tag in the repo
+      - id: last-tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Get release by tag
+        id: check-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tag = '${{ steps.last-tag.outputs.tag }}';
+            try {
+              const release = await github.request(
+                'GET /repos/{owner}/{repo}/releases/tags/{tag}',
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag,
+                }
+              );
+              core.setOutput('exists', true);
+            }
+            catch (err) {
+              if (err.status === 404) {
+                // err is a GitHubError; no release was found
+                core.setOutput('exists', false);
+              } else {
+                throw err; // any other HTTP error (5xx, 403, etc.)
+              }
+            }
+
+      - name: Show results
+        run: |
+          echo "Latest tag: ${{ steps.last-tag.outputs.tag }}"
+          echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
+
+#-----------------------------------------------------------------------
+#  3️⃣  Run the build *only if* no release exists
+#-----------------------------------------------------------------------
+  build:
+    if: needs.detect.outputs.release_exists == 'false'
+    needs: detect
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      tag: ${{ needs.detect.outputs.last_tag }}   # <<< Pass the tag
+
+#-----------------------------------------------------------------------
+#  4️⃣  Create the release & attach the build artefacts
+#-----------------------------------------------------------------------
+  release:
+    if: needs.detect.outputs.release_exists == 'false'
+    needs: [detect, build]          # wait for the build to finish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write 
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.detect.outputs.last_tag }}   # pulls the commit that the tag points at
+
+      # Download the artefact(s) that the build step uploaded
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries           # <-- same name as used in the build workflow
+          path: ${{ runner.temp }}/binaries
+
+      - name: Check last tag
+        run: |
+          echo "Tag: ${{ needs.detect.outputs.last_tag }}"
+          echo "${{ runner.temp }}/binaries"
+          ls -al ${{ runner.temp }}/binaries
+
+      # Create the GitHub release
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.detect.outputs.last_tag }}
+          name: Release ${{ needs.detect.outputs.last_tag }}
+          body: |
+            🎉 Release `${{ needs.detect.outputs.last_tag }}` has been built automatically.
+            See the attached artifacts for the compiled binaries.
+          files: |
+            ${{ runner.temp }}/binaries/*
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

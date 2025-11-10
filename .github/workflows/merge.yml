@@ -1,0 +1,59 @@
+name: Merge upstream, Build and Release
+
+on:
+  # You can trigger this workflow in many ways (push, pull_request, schedule, manual)
+  workflow_dispatch:
+  schedule:
+    - cron: '45 0 * * 5'   # every friday at 0:45 UTC
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write          # required for git push with GITHUB_TOKEN
+
+    steps:
+      # Check out your repo (full history)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0      # required for full merge history
+
+      # Configure git user (required for commit)
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Add the upstream repo as a remote
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://gitlab.torproject.org/tpo/core/torsocks.git
+
+      # Fetch and merge the branch you want
+      - name: Fetch upstream
+        run: |
+          # Fetch all refs from the new remote
+          git fetch upstream --prune
+          git fetch upstream --tags
+      
+      # Fetch and merge the branch you want
+      - name: Merge upstream
+        run: |
+          # Replace 'main' with the upstream branch you want to merge
+          git merge upstream/main --allow-unrelated-histories -m "Merge upstream/main"
+
+      # Push the merge commit back to your repo
+      - name: Push merge
+        run: |
+          git push --all
+          git push --tags
+          
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    needs: merge-upstream
+    uses: ./.github/workflows/release.yml
+    permissions: 
+      contents: write
+    secrets: inherit    
