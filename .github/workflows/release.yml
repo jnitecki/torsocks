@@ -58,6 +58,8 @@ jobs:
     needs: detect
     uses: ./.github/workflows/build.yml
     secrets: inherit
+    with:
+      tag: ${{ needs.detect.outputs.last_tag }}   # <<< Pass the tag
 
 #-----------------------------------------------------------------------
 #  4️⃣  Create the release & attach the build artefacts

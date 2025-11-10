@@ -1,16 +1,28 @@
 name: Build
 on:
   workflow_dispatch:
-
+    inputs:
+      tag:
+        description: 'Git tag to build (e.g. v1.2.3)'
+        required: true
+        type: string
+  workflow_call:
+    inputs:
+      tag:
+        required: true
+        type: string
+        
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      # --------------------------------------------------------------------
-      # 1. Checkout the repo
-      # --------------------------------------------------------------------
-      - name: Checkout code
-        uses: actions/checkout@v3
+      # -----------------------------------------------------------------
+      # 1. Checkout the **exact tag** that we’re about to release
+      # -----------------------------------------------------------------
+      - name: Checkout tag ${{ inputs.tag }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}   # pulls the commit that the tag points at
 
       # --------------------------------------------------------------------
       # 2. Install build‑time dependencies
