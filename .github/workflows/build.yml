@@ -24,6 +24,26 @@ jobs:
         with:
           ref: ${{ inputs.tag }}   # pulls the commit that the tag points at
 
+      # 1️⃣  Verify that the expression engine sees replace()
+      - name: Verify replace()
+        run: |
+          echo "Test replace() → ${{ replace('v1.2.3', 'v', '') }}"
+
+      # 2️⃣  Use the tag passed as an input
+      - name: Build with stripped tag (replace())
+        run: |
+          # This works on every current cloud runner
+          make -j$(nproc) LT_VERSION_INFO=${{ replace(inputs.tag, 'v', '') }}
+
+      # 3️⃣  Fallback that never needs replace()
+      - name: Build with stripped tag (shell fallback)
+        run: |
+          # Grab the tag value (the workflow input, or the git ref)
+          TAG=${{ inputs.tag }}
+          # Remove one leading 'v' if present
+          STRIPPED=${TAG#v}
+          make -j$(nproc) LT_VERSION_INFO=$STRIPPED
+          
       # --------------------------------------------------------------------
       # 2. Install build‑time dependencies
       # --------------------------------------------------------------------
