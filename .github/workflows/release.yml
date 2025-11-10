@@ -32,59 +32,28 @@ jobs:
             echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
 
       - name: Get release by tag
-        id: release
+        id: check-release
         uses: actions/github-script@v6
         with:
           script: |
             const tag = '${{ steps.last-tag.outputs.tag }}';
-
-            const release = await github.request(
-              'GET /repos/{owner}/{repo}/releases/tags/{tag}',
-              {
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                tag,
-              }
-            );
-
-            core.setOutput('release', release.data);
-
-      - name: Get release by tag
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const Octokit = require('@octokit/rest');
-            const octokit = new Octokit({
-              auth: process.env.GITHUB_TOKEN,   // GitHub token is available automatically
-            });
-
-            const tag = '${{ steps.last-tag.outputs.tag }}';
-
-            const { data: release } = await octokit.repos.getReleaseByTag({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              tag,
-            });
-
-            core.setOutput('release', release);
-
-      # 2. Does a release already exist for that tag?
-      - id: check-release
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const tag   = '${{ steps.last-tag.outputs.tag }}';
-            const owner = context.repo.owner;
-            const repo  = context.repo.repo;
-
             try {
-              await github.repos.getReleaseByTag({ owner, repo, tag });
-              core.setOutput('exists', 'true');      // release found
-            } catch (err) {
+              const release = await github.request(
+                'GET /repos/{owner}/{repo}/releases/tags/{tag}',
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  tag,
+                }
+              );
+              core.setOutput('exists', true);
+            }
+            catch (err) {
               if (err.status === 404) {
-                core.setOutput('exists', 'false');   // no release
+                // err is a GitHubError; no release was found
+                core.setOutput('exists', false);
               } else {
-                throw err;                          // other error
+                throw err; // any other HTTP error (5xx, 403, etc.)
               }
             }
 
