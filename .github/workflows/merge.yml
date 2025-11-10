@@ -36,7 +36,8 @@ jobs:
       - name: Fetch upstream
         run: |
           # Fetch all refs from the new remote
-          git fetch upstream --all --tags        # include tags
+          git fetch upstream --prune
+          git fetch upstream --tags
       
       # Fetch and merge the branch you want
       - name: Merge upstream
