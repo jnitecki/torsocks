@@ -13,32 +13,38 @@ jobs:
   merge-upstream:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Check out your repo (full history)
+      # Check out your repo (full history)
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0      # required for full merge history
 
-      # 2️⃣ Configure git user (required for commit)
+      # Configure git user (required for commit)
       - name: Configure git user
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 3️⃣ Add the upstream repo as a remote
+      # Add the upstream repo as a remote
       - name: Add upstream remote
         run: |
           git remote add upstream https://gitlab.torproject.org/tpo/core/torsocks.git
 
-      # 4️⃣ Fetch and merge the branch you want
+      # Fetch and merge the branch you want
       - name: Fetch upstream
         run: |
-          git fetch upstream
+          # Fetch all refs from the new remote
+          git fetch upstream --all --tags        # include tags
+      
+      # Fetch and merge the branch you want
+      - name: Merge upstream
+        run: |
           # Replace 'main' with the upstream branch you want to merge
           git merge upstream/main --allow-unrelated-histories -m "Merge upstream/main"
 
-      # 5️⃣ Push the merge commit back to your repo
+      # Push the merge commit back to your repo
       - name: Push merge
         run: |
-          git push
+          git push --tags
+          
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
