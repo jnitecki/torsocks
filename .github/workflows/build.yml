@@ -59,7 +59,7 @@ jobs:
       - name: Create tar
         run: |
           mkdir -p "${RUNNER_TEMP}/binaries"
-          tar czf "${RUNNER_TEMP}/binaries/linux-amd64.tar.gz" -C src/lib/.libs libtorsocks.so -C src/bin torsocks
+          tar czf "${RUNNER_TEMP}/binaries/linux-amd64.tar.gz" -C src/lib/.libs libtorsocks.so -C ../../../src/bin torsocks
 
       - name: Check files
         run: |
