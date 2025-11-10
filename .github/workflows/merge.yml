@@ -47,6 +47,7 @@ jobs:
       # Push the merge commit back to your repo
       - name: Push merge
         run: |
+          git push --all
           git push --tags
           
         env:
