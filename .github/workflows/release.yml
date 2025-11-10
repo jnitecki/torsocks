@@ -105,5 +105,6 @@ jobs:
             See the attached artifacts for the compiled binaries.
           files: |
             ${{ runner.temp }}/binaries/*
+          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
