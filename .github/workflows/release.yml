@@ -45,8 +45,10 @@ jobs:
               }
             }
 
-      - run: echo "Latest tag: ${{ steps.last-tag.outputs.tag }}"
-      - run: echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
+      - name: Show results
+        run: |
+          echo "Latest tag: ${{ steps.last-tag.outputs.tag }}"
+          echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
 
 #-----------------------------------------------------------------------
 #  3️⃣  Run the build *only if* no release exists
