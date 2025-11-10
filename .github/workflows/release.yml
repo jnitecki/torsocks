@@ -1,5 +1,4 @@
 name: Release
-
 on:
   workflow_dispatch:
 
@@ -10,8 +9,8 @@ jobs:
   detect:
     runs-on: ubuntu-latest
     permissions:
-      contents: read    # needed for reading files, commits, etc.
-      releases: read    # needed for querying releases
+      contents: write   # allows creating releases, pushing tags, etc.
+      actions: write    # if you need to trigger or cancel other workflows
     outputs:
       last_tag:       ${{ steps.last-tag.outputs.tag }}
       release_exists: ${{ steps.check-release.outputs.exists }}
