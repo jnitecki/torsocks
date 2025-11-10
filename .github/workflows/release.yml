@@ -9,10 +9,13 @@ on:
 jobs:
   detect:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read    # needed for reading files, commits, etc.
+      releases: read    # needed for querying releases
     outputs:
       last_tag:       ${{ steps.last-tag.outputs.tag }}
       release_exists: ${{ steps.check-release.outputs.exists }}
-
+    
     steps:
       # Grab the entire history + all tags (needed for `git describe`)
       - uses: actions/checkout@v4
