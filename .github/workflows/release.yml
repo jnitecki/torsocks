@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+#-----------------------------------------------------------------------
+#  1️⃣  Detect the newest tag and whether a release already exists
+#-----------------------------------------------------------------------
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      last_tag:       ${{ steps.last-tag.outputs.tag }}
+      release_exists: ${{ steps.check-release.outputs.exists }}
+
+    steps:
+      # Grab the entire history + all tags (needed for `git describe`)
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 1. Find the newest tag in the repo
+      - id: last-tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0)
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      # 2. Does a release already exist for that tag?
+      - id: check-release
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const tag   = '${{ steps.last-tag.outputs.tag }}';
+            const owner = context.repo.owner;
+            const repo  = context.repo.repo;
+
+            try {
+              await github.repos.getReleaseByTag({ owner, repo, tag });
+              core.setOutput('exists', 'true');      // release found
+            } catch (err) {
+              if (err.status === 404) {
+                core.setOutput('exists', 'false');   // no release
+              } else {
+                throw err;                          // other error
+              }
+            }
+
+      - run: echo "Latest tag: ${{ steps.last-tag.outputs.tag }}"
+      - run: echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
+
+#-----------------------------------------------------------------------
+#  3️⃣  Run the build *only if* no release exists
+#-----------------------------------------------------------------------
+  build:
+    if: needs.detect.outputs.release_exists == 'false'
+    needs: detect
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+
+#-----------------------------------------------------------------------
+#  4️⃣  Create the release & attach the build artefacts
+#-----------------------------------------------------------------------
+  release:
+    if: needs.detect.outputs.release_exists == 'false'
+    needs: build          # wait for the build to finish
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Download the artefact(s) that the build step uploaded
+      - uses: actions/download-artifact@v4
+        with:
+          name: app-build          # <-- same name as used in the build workflow
+
+      # Create the GitHub release
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.detect.outputs.last_tag }}
+          name: Release ${{ needs.detect.outputs.last_tag }}
+          body: |
+            🎉 Release `${{ needs.detect.outputs.last_tag }}` has been built automatically.
+            See the attached artefacts for the compiled binaries.
+          files: |
+            app-build/*                # <-- all files that were uploaded by the build step
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
