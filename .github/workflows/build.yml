@@ -62,13 +62,12 @@ jobs:
       - name: Create tar
         run: |
           mkdir -p "${RUNNER_TEMP}/upload"
-          tar czf linux-amd64.tar.gz src/lib/.libs/libtorsocks.so src/bin/torsocks
+          tar czf "${RUNNER_TEMP}/upload/linux-amd64.tar.gz" src/lib/.libs/libtorsocks.so src/bin/torsocks
 
       - name: Check files
         run: |
           ls -al src/lib/.libs/
           ls -al "${RUNNER_TEMP}/upload"
-      
 
       # --------------------------------------------------------------------
       # 6. Upload build artifacts
