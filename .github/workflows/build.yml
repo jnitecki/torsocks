@@ -50,7 +50,8 @@ jobs:
       # 4. Build with GCC (via make)
       # --------------------------------------------------------------------
       - name: Build
-        run: make -j$(nproc) LT_VERSION_INFO=${{ startsWith(inputs.tag, 'v') ? inputs.tag.substring(1) : inputs.tag }}
+        run: |
+          make -j$(nproc) LT_VERSION_INFO=${{ startsWith(inputs.tag, 'v') ? inputs.tag.substring(1) : inputs.tag }}
 
       # --------------------------------------------------------------------
       # 5. Create upload folder and copy files
