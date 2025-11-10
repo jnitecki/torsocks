@@ -3,11 +3,8 @@ name: Merge upstream, Build and Release
 on:
   # You can trigger this workflow in many ways (push, pull_request, schedule, manual)
   workflow_dispatch:
-  push:
-    branches:
-      - main   # or whatever your default branch is
   schedule:
-    - cron: '0 0 * * *'   # every midnight UTC (optional)
+  - cron: '0 45 * * fri'   # every friday at 0:45 UTC
 
 jobs:
   merge-upstream:
