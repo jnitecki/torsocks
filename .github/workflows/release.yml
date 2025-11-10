@@ -75,6 +75,8 @@ jobs:
     if: needs.detect.outputs.release_exists == 'false'
     needs: [detect, build]          # wait for the build to finish
     runs-on: ubuntu-latest
+    permissions:
+      contents: write 
 
     steps:
       - uses: actions/checkout@v4
