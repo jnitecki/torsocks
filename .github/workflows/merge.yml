@@ -12,6 +12,9 @@ on:
 jobs:
   merge-upstream:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write          # required for git push with GITHUB_TOKEN
+
     steps:
       # Check out your repo (full history)
       - uses: actions/checkout@v4
