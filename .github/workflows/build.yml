@@ -51,7 +51,7 @@ jobs:
       # --------------------------------------------------------------------
       - name: Build
         run: |
-          "make -j$(nproc) LT_VERSION_INFO=${{ startsWith(inputs.tag, 'v') && inputs.tag.substring(1) || inputs.tag }}"
+          "make -j$(nproc) LT_VERSION_INFO=${{ inputs.tag matches '^v' && inputs.tag[1:] || inputs.tag  }}"
 
       # --------------------------------------------------------------------
       # 5. Create upload folder and copy files
