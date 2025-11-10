@@ -1,6 +1,7 @@
 name: Build and Release
 on:
   workflow_dispatch:
+  workflow_call:
 
 #-----------------------------------------------------------------------
 #  1️⃣  Detect the newest tag and whether a release already exists
