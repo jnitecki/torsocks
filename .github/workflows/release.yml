@@ -26,11 +26,6 @@ jobs:
           TAG=$(git describe --tags --abbrev=0)
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Show results
-        run: |
-          echo "Latest tag: ${{ steps.last-tag.outputs.tag }}"
-            echo "Release already exists? ${{ steps.check-release.outputs.exists }}"
-
       - name: Get release by tag
         id: check-release
         uses: actions/github-script@v6
@@ -78,13 +73,13 @@ jobs:
 #-----------------------------------------------------------------------
   release:
     if: needs.detect.outputs.release_exists == 'false'
-    needs: build          # wait for the build to finish
+    needs: [detect, build]          # wait for the build to finish
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.tag }}   # pulls the commit that the tag points at
+          ref: ${{ needs.detect.outputs.last_tag }}   # pulls the commit that the tag points at
 
       # Download the artefact(s) that the build step uploaded
       - uses: actions/download-artifact@v4
