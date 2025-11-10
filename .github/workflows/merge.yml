@@ -53,3 +53,8 @@ jobs:
           
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    needs: merge-upstream
+    uses: ./.github/workflows/release.yml
+    secrets: inherit    
