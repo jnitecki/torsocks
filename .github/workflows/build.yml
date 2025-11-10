@@ -51,7 +51,7 @@ jobs:
       # --------------------------------------------------------------------
       - name: Build
         run: |
-          make -j$(nproc) LT_VERSION_INFO=${{ inputs.tag.replace('^v', '', 'regex') }}
+          make -j$(nproc) LT_VERSION_INFO=${{ replace(inputs.tag, '^v', '', 'g') }}
 
       # --------------------------------------------------------------------
       # 5. Create upload folder and copy files
