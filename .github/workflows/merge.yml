@@ -1,4 +1,4 @@
-name: Merge upstream and release
+name: Merge upstream, Build and Release
 
 on:
   # You can trigger this workflow in many ways (push, pull_request, schedule, manual)
