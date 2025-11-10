@@ -1,4 +1,4 @@
-name: Pull from upstream & merge
+name: Merge upstream and release
 
 on:
   # You can trigger this workflow in many ways (push, pull_request, schedule, manual)
