@@ -87,10 +87,12 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: binaries           # <-- same name as used in the build workflow
+          path: ${{ runner.temp }}/binaries
 
       - name: Check last tag
         run: |
           echo "Tag: ${{ needs.detect.outputs.last_tag }}"
+          ls -al ${{ runner.temp }}/binaries
 
       # Create the GitHub release
       - uses: softprops/action-gh-release@v2
@@ -99,8 +101,8 @@ jobs:
           name: Release ${{ needs.detect.outputs.last_tag }}
           body: |
             🎉 Release `${{ needs.detect.outputs.last_tag }}` has been built automatically.
-            See the attached artefacts for the compiled binaries.
+            See the attached artifacts for the compiled binaries.
           files: |
-            binaries/*                # <-- all files that were uploaded by the build step
+            ${{ runner.temp }}/binaries/*                # <-- all files that were uploaded by the build step
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
