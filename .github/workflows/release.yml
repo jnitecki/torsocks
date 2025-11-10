@@ -92,6 +92,7 @@ jobs:
       - name: Check last tag
         run: |
           echo "Tag: ${{ needs.detect.outputs.last_tag }}"
+          echo "${{ runner.temp }}/binaries"
           ls -al ${{ runner.temp }}/binaries
 
       # Create the GitHub release
