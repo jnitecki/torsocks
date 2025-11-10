@@ -4,7 +4,7 @@ on:
   # You can trigger this workflow in many ways (push, pull_request, schedule, manual)
   workflow_dispatch:
   schedule:
-    - cron: '0 45 * * 5'   # every friday at 0:45 UTC
+    - cron: '45 0 * * 5'   # every friday at 0:45 UTC
 
 jobs:
   merge-upstream:
